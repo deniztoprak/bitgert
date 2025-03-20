@@ -1,7 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { ethers } from "ethers";
 
 function Header() {
+  const [provider, setProvider] = React.useState(null);
+  const [signer, setSigner] = React.useState(null);
+
+  const connectWallet = async () => {
+    if (window.ethereum == null) {
+      setProvider(ethers.getDefaultProvider());
+    
+    } else {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+        setProvider(provider)
+        setSigner(await provider.getSigner());
+    }
+  };
+  
   return (
     <nav className="navbar navbar-default navbar-trans navbar-expand-lg">
       <div className="container">
@@ -34,6 +49,11 @@ function Header() {
               <a className="nav-link" href="/faq">
                 FAQ
               </a>
+            </li>
+            <li className="nav-item">
+              <button type="button" href="/faq" onClick={connectWallet}>
+                Connect Wallet
+              </button>
             </li>
 
             <div className="modal" id="myModal-14">

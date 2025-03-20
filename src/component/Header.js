@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 
 function Header() {
   const [provider, setProvider] = React.useState(null);
-  const [signer, setSigner] = React.useState(null);
+  const [signerBalance, setSignerBalance] = React.useState(null);
   const [signerAddr, setSignerAddr] = React.useState(null);
 
   React.useEffect(() => {
@@ -30,16 +30,17 @@ function Header() {
     } else {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
+      const signerAddr = await signer.getAddress();
         setProvider(provider)
-        setSigner(signer);
-        setSignerAddr(await signer.getAddress());
+        setSignerAddr(signerAddr);
+        setSignerBalance(await provider.getBalance(signerAddr));
     }
   };
 
   const disconnectWallet = () => {
 		setProvider(null);
-		setSigner(null);
 		setSignerAddr(null);
+    setSignerBalance(null);
 	};
 
 
@@ -79,7 +80,8 @@ function Header() {
             </li>
             <li className="nav-item">
               <button type="button" href="/faq" onClick={connectWallet}>
-                {provider ? signerAddr: "Connect Wallet"}
+                {provider ? signerAddr : "Connect Wallet"}
+                {provider && <p>{`Balance: ${signerBalance} BNB`}</p>}
               </button>
             </li>
 

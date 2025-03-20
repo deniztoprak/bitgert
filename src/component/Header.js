@@ -5,6 +5,23 @@ import { ethers } from "ethers";
 function Header() {
   const [provider, setProvider] = React.useState(null);
   const [signer, setSigner] = React.useState(null);
+  const [signerAddr, setSignerAddr] = React.useState(null);
+
+  React.useEffect(() => {
+		window.ethereum.on("accountsChanged", onAccountChange);
+
+		return () => {
+			window.ethereum.removeListener("accountsChanged", onAccountChange);
+		};
+	}, []);
+
+  const onAccountChange = (accounts) => {
+		if (accounts.length === 0) {
+			disconnectWallet();
+		} else {
+			connectWallet();
+		}
+	};
 
   const connectWallet = async () => {
     if (window.ethereum == null) {
@@ -12,10 +29,20 @@ function Header() {
     
     } else {
       const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
         setProvider(provider)
-        setSigner(await provider.getSigner());
+        setSigner(signer);
+        setSignerAddr(await signer.getAddress());
     }
   };
+
+  const disconnectWallet = () => {
+		setProvider(null);
+		setSigner(null);
+		setSignerAddr(null);
+	};
+
+
   
   return (
     <nav className="navbar navbar-default navbar-trans navbar-expand-lg">
@@ -52,7 +79,7 @@ function Header() {
             </li>
             <li className="nav-item">
               <button type="button" href="/faq" onClick={connectWallet}>
-                Connect Wallet
+                {provider ? signerAddr: "Connect Wallet"}
               </button>
             </li>
 
